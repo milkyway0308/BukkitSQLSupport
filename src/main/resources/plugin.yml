@@ -1,0 +1,6 @@
+name: BukkitSQLSupport
+version: 1.0
+main: skywolf46.bss.client.BukkitSQLSupport
+softdepend:
+  - BungeeSwitchListener
+  - BungeePlayerSync
