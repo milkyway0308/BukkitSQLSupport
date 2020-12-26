@@ -67,7 +67,7 @@ publishing {
         create<MavenPublication>("jar") {
             from(components["java"])
             groupId = "skywolf46"
-            artifactId = "bps"
+            artifactId = "bss"
             version = properties["version"] as String
             pom {
                 url.set("https://github.com/milkyway0308/BukkitSQLSupport.git")

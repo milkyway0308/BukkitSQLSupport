@@ -2,6 +2,7 @@ package skywolf46.bss.client;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import skywolf46.bss.api.SQLTable;
 import skywolf46.bss.threads.SQLThread;
 
 import java.io.File;
@@ -59,7 +60,11 @@ public class BukkitSQLSupport extends JavaPlugin {
     }
 
     public static Connection createNewConnection() throws SQLException {
-        return DriverManager.getConnection(sqlAddress, sqlProp);
+        Connection conn = DriverManager.getConnection(sqlAddress, sqlProp);
+        try (PreparedStatement xt = conn.prepareStatement("use BukkitSQLSupport")) {
+            xt.executeUpdate();
+        }
+        return conn;
     }
 
     public static SQLThread createThread(int connectionAmount) throws SQLException {

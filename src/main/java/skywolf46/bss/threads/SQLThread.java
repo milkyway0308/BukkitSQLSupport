@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class SQLThread {
     private List<ConnectionManagement> manager = new ArrayList<>();
-    private AtomicBoolean enabled = new AtomicBoolean(false);
+    private AtomicBoolean enabled = new AtomicBoolean(true);
 
     public SQLThread(int threads) throws SQLException {
         for (int i = 0; i < threads; i++) {
@@ -61,6 +61,8 @@ public class SQLThread {
         public void appendTask(SQLFunction funct) {
             lock.writeLock().lock();
             functs.add(funct);
+            increaseTask();
+//            System.out.println("Appended! " + functs.size());
             lock.writeLock().unlock();
         }
 
@@ -74,6 +76,8 @@ public class SQLThread {
         private SQLFunction nextFunction() {
             if (functs.size() <= 0)
                 return null;
+            decreaseTask();
+//            System.out.println("Decreased!");
             return functs.remove(0);
         }
 
@@ -82,7 +86,13 @@ public class SQLThread {
             while (enabled.get()) {
                 SQLFunction funct;
                 while ((funct = next()) != null) {
+//                    System.out.println("Active!");
                     funct.work(connection);
+                }
+                try {
+                    Thread.sleep(3L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
             try {
