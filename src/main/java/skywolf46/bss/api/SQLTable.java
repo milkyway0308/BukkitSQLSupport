@@ -143,6 +143,32 @@ public class SQLTable {
         }
     }
 
+    public boolean drop(SQLSelectList list) {
+        StringBuilder selector = new StringBuilder("delete from ").append(tableName).append(" where ");
+        for (int i = 0; i < list.size(); i++) {
+            ItemTriple<AbstractSQLType, String, Object> k = list.get(i);
+            if (i != 0) {
+                selector.append(" and ");
+            }
+            selector.append("`").append(k.getV()).append("` = ?");
+        }
+        selector.append(";");
+        try (PreparedStatement stmt = con.prepareStatement(selector.toString())) {
+            for (int i = 0; i < list.size(); i++) {
+                ItemTriple<AbstractSQLType, String, Object> k = list.get(i);
+                k.getK().insert(stmt, i + 1, k.getX());
+            }
+            int result = stmt.executeUpdate();
+            return result > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean delete(SQLSelectList list) {
+        return drop(list);
+    }
+
     public <T> T selectOne(AbstractSQLType<T> type, String name, SQLSelectList list) {
         List<T> sel = select(type, name, list);
         if (sel.size() <= 0)
@@ -150,7 +176,7 @@ public class SQLTable {
         return sel.get(0);
     }
 
-    public void selectRaw(AppendableList<String> names, AppendableList<ItemTriple<AbstractSQLType, String, Object>> list, Consumer<ResultSet> rsCons) {
+    public void selectRaw(AppendableList<String> names, SQLSelectList list, Consumer<ResultSet> rsCons) {
         StringBuilder selector = new StringBuilder("select ");
         for (int i = 0; i < names.size(); i++) {
             if (i != 0)
