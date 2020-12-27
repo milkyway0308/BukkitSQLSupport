@@ -9,6 +9,7 @@ import skywolf46.bss.util.ItemPair;
 import skywolf46.bss.util.ItemTriple;
 import skywolf46.bss.util.PairMap;
 
+import javax.annotation.Nullable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -78,20 +79,28 @@ public class SQLTable {
         }
     }
 
-    public SelectableResult selectMultiple(AppendableStringList name, SQLSelectList list) {
+    public SelectableResult selectMultiple(AppendableStringList name) {
+        return selectMultiple(name, null);
+    }
+
+    public SelectableResult selectMultiple(AppendableStringList name, @Nullable SQLSelectList list) {
         StringBuilder selector = new StringBuilder("select ");
         for (int i = 0; i < name.size(); i++) {
             if (i != 0)
                 selector.append(", ");
             selector.append(name.get(i));
         }
-        selector.append(" from ").append(tableName).append(" where ");
-        for (int i = 0; i < list.size(); i++) {
-            ItemTriple<AbstractSQLType, String, Object> k = list.get(i);
-            if (i != 0) {
-                selector.append(" and ");
+        selector.append(" from ").append(tableName);
+
+        if (list != null && !list.isEmpty()) {
+            selector.append(" where ");
+            for (int i = 0; i < list.size(); i++) {
+                ItemTriple<AbstractSQLType, String, Object> k = list.get(i);
+                if (i != 0) {
+                    selector.append(" and ");
+                }
+                selector.append("`").append(k.getV()).append("` = ?");
             }
-            selector.append("`").append(k.getV()).append("` = ?");
         }
         selector.append(";");
         try {
