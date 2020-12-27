@@ -105,9 +105,11 @@ public class SQLTable {
         selector.append(";");
         try {
             PreparedStatement stmt = con.prepareStatement(selector.toString());
-            for (int i = 0; i < list.size(); i++) {
-                ItemTriple<AbstractSQLType, String, Object> k = list.get(i);
-                k.getK().insert(stmt, i + 1, k.getX());
+            if (list != null) {
+                for (int i = 0; i < list.size(); i++) {
+                    ItemTriple<AbstractSQLType, String, Object> k = list.get(i);
+                    k.getK().insert(stmt, i + 1, k.getX());
+                }
             }
             return new SelectableResult(stmt, stmt.executeQuery());
         } catch (SQLException e) {
