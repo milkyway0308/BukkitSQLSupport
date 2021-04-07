@@ -4,3 +4,4 @@ main: skywolf46.bss.client.BukkitSQLSupport
 softdepend:
   - BungeeSwitchListener
   - BungeePlayerSync
+  - KotlinRuntime
